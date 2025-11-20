@@ -1,1 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Branch Till Count Survey System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background-color: var(--primary);
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border: none;
+        }
+        
+        .card-header {
+            background-color: var(--secondary);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            border-color: var(--success);
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            border-color: var(--warning);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            border-color: var(--danger);
+        }
+        
+        .sidebar {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            height: fit-content;
+        }
+        
+        .sidebar .nav-link {
+            color: var(--dark);
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .stats-card {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stats-card i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .stats-card.total-tills {
+            background-color: var(--secondary);
+        }
+        
+        .stats-card.faulty-tills {
+            background-color: var(--danger);
+        }
+        
+        .stats-card.working-printers {
+            background-color: var(--success);
+        }
+        
+        .stats-card.faulty-eft {
+            background-color: var(--warning);
+        }
+        
+        .branch-filter {
+            max-width: 250px;
+        }
+        
+        .history-item {
+            border-left: 4px solid var(--secondary);
+            padding-left: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .faulty-item {
+            background-color: #ffeaea;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .ticket-number {
+            font-family: monospace;
+            background-color: #f8f9fa;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        
+        .form-section {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .required:after {
+            content: " *";
+            color: var(--danger);
+        }
+        
+        .company-badge {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 5px;
+        }
+        
+        .company-nrm {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .company-norich {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .company-balmain {
+            background-color: #9b59b6;
+            color: white;
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 0 0 5px 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .search-result-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .search-result-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .faulty-details-modal .faulty-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .company-report-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-cash-register me-2"></i>
+                Till Count Survey System
+            </a>
+        </div>
+    </nav>
 
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 mb-4">
+                <div class="sidebar">
+                    <h5 class="mb-3">Quick Actions</h5>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" id="newSurveyLink">
+                                <i class="fas fa-plus-circle me-2"></i> New Survey
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="viewAllSurveys">
+                                <i class="fas fa-list me-2"></i> View All Surveys
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="exportMenuLink">
+                                <i class="fas fa-download me-2"></i> Export Data
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    <h5 class="mt-4 mb-3">Branch Search</h5>
+                    <div class="mb-3 search-box">
+                        <input type="text" class="form-control" id="branchSearch" placeholder="Search for a branch...">
+                        <div class="search-results" id="searchResults"></div>
+                    </div>
+                    
+                    <h5 class="mt-4 mb-3">Quick Stats</h5>
+                    <div class="stats-card total-tills" data-type="all">
+                        <i class="fas fa-cash-register"></i>
+                        <h4 id="totalTillsCount">-</h4>
+                        <p>Total Tills</p>
+                    </div>
+                    <div class="stats-card faulty-tills" data-type="faulty-tills">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h4 id="faultyTillsCount">-</h4>
+                        <p>Faulty Tills</p>
+                    </div>
+                    <div class="stats-card working-printers" data-type="working-printers">
+                        <i class="fas fa-print"></i>
+                        <h4 id="workingPrintersCount">-</h4>
+                        <p>Working Printers</p>
+                    </div>
+                    <div class="stats-card faulty-eft" data-type="faulty-eft">
+                        <i class="fas fa-credit-card"></i>
+                        <h4 id="faultyEFTCount">-</h4>
+                        <p>Faulty EFT Devices</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <!-- Dashboard Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Branch Till Count Survey</h2>
+                    <div class="export-buttons">
+                        <button class="btn btn-success" id="exportCSV">
+                            <i class="fas fa-file-csv me-1"></i> Export CSV
+                        </button>
+                        <button class="btn btn-danger" id="exportPDF">
+                            <i class="fas fa-file-pdf me-1"></i> Export PDF
+                        </button>
+                        <button class="btn btn-secondary" id="printReport">
+                            <i class="fas fa-print me-1"></i> Print
+                        </button>
+                        <button class="btn btn-primary" id="newSurveyBtn">
+                            <i class="fas fa-plus me-1"></i> New Survey
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Survey Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-clipboard-list me-2"></i> Till Count Survey Form
+                    </div>
+                    <div class="card-body">
+                        <form id="surveyForm">
+                            <div class="mb-3">
+                                <label for="branchName" class="form-label required">Branch Name</label>
+                                <select class="form-select" id="branchName" required>
+                                    <option value="">Select Branch</option>
+                                    <!-- Branches will be populated by JavaScript -->
+                                </select>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h5><i class="fas fa-cash-register me-2"></i> Till Information</h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="totalTills" class="form-label required">Total Number of Tills</label>
+                                        <input type="number" class="form-control" id="totalTills" min="0" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="faultyTills" class="form-label">Number of Faulty Tills</label>
+                                        <input type="number" class="form-control" id="faultyTills" min="0">
+                                    </div>
+                                </div>
+                                
+                                <div id="faultyTillsDetails" class="mb-3" style="display: none;">
+                                    <label class="form-label">Faulty Till Details</label>
+                                    <div id="faultyTillsContainer">
+                                        <!-- Dynamic content for faulty tills -->
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary mt-2" id="addFaultyTill">
+                                        <i class="fas fa-plus me-1"></i> Add Another Faulty Till
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h5><i class="fas fa-print me-2"></i> Printer Information</h5>
+                                
+                                <div class="mb-3">
+                                    <label for="workingSparePrinters" class="form-label required">Total Number of Working Spare Printers</label>
+                                    <input type="number" class="form-control" id="workingSparePrinters" min="0" required>
+                                    <div class="form-text">A branch should have a minimum of 3 working spare printers</div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h5><i class="fas fa-credit-card me-2"></i> EFT Devices</h5>
+                                
+                                <div class="mb-3">
+                                    <label for="faultyEFT" class="form-label">Number of Missing or Faulty EFT Devices</label>
+                                    <input type="number" class="form-control" id="faultyEFT" min="0">
+                                </div>
+                                
+                                <div id="faultyEFTDetails" class="mb-3" style="display: none;">
+                                    <label class="form-label">Faulty EFT Device Details</label>
+                                    <div id="faultyEFTContainer">
+                                        <!-- Dynamic content for faulty EFT devices -->
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary mt-2" id="addFaultyEFT">
+                                        <i class="fas fa-plus me-1"></i> Add Another Faulty EFT Device
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h5><i class="fas fa-barcode me-2"></i> Handheld Scanners</h5>
+                                
+                                <div class="mb-3">
+                                    <label for="scannerStatus" class="form-label">Do you have enough handheld scanners?</label>
+                                    <select class="form-select" id="scannerStatus">
+                                        <option value="yes">Yes, we have enough</option>
+                                        <option value="no">No, we need more</option>
+                                    </select>
+                                </div>
+                                
+                                <div id="scannerNeeds" class="mb-3" style="display: none;">
+                                    <label for="scannersNeeded" class="form-label">How many additional scanners do you need?</label>
+                                    <input type="number" class="form-control" id="scannersNeeded" min="0">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="additionalNotes" class="form-label">Additional Notes</label>
+                                <textarea class="form-control" id="additionalNotes" rows="3"></textarea>
+                            </div>
+                            
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="button" class="btn btn-secondary me-md-2" id="saveDraft">Save Draft</button>
+                                <button type="submit" class="btn btn-primary">Submit Survey</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Survey History -->
+                <div class="card mt-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-history me-2"></i> Survey History
+                        </div>
+                        <div class="export-buttons">
+                            <button class="btn btn-sm btn-success" id="exportHistoryCSV">
+                                <i class="fas fa-file-csv me-1"></i> CSV
+                            </button>
+                            <button class="btn btn-sm btn-danger" id="exportHistoryPDF">
+                                <i class="fas fa-file-pdf me-1"></i> PDF
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5>Previous Survey Responses</h5>
+                            <div class="input-group branch-filter" style="width: auto;">
+                                <select class="form-select" id="historyBranchFilter">
+                                    <option value="">All Branches</option>
+                                    <!-- Branches will be populated by JavaScript -->
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div id="surveyHistory">
+                            <p class="text-muted">No survey data available yet. Submit your first survey to see history here.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Faulty Items Modal -->
+    <div class="modal fade" id="faultyItemsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="faultyItemsModalTitle">Faulty Items Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="faultyItemsModalBody">
+                    <!-- Dynamic content for faulty items -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Branch data - Using your exact branch list
+        const branches = [
+            { id: 'beitbridge', name: 'Beitbridge', company: 'NRM' },
+            { id: 'bindura', name: 'Bindura', company: 'Norich' },
+            { id: 'bradburn', name: 'Bradburn', company: 'NRM' },
+            { id: 'bulawayo', name: 'Bulawayo', company: 'NORICH' },
+            { id: 'checheche', name: 'Checheche', company: 'NRM' },
+            { id: 'chinhoyi', name: 'Chinhoyi', company: 'NORICH' },
+            { id: 'chipingehw', name: 'Chipinge HW', company: 'NRM' },
+            { id: 'chipinge', name: 'Chipinge WS', company: 'NRM' },
+            { id: 'chiredzihw', name: 'Chiredzi HW', company: 'NRM' },
+            { id: 'chiredzi', name: 'Chiredzi WS', company: 'NRM' },
+            { id: 'chivhu', name: 'Chivhu', company: 'BALMAIN' },
+            { id: 'chivi', name: 'Chivi', company: 'NRM' },
+            { id: 'masvingocc', name: 'Masvingo CC', company: 'NRM' },
+            { id: 'gokwe', name: 'Gokwe', company: 'BALMAIN' },
+            { id: 'graniteside', name: 'Graniteside', company: 'BALMAIN' },
+            { id: 'gweru', name: 'Gweru', company: 'BALMAIN' },
+            { id: 'hurudza', name: 'Hurudza', company: 'NRM' },
+            { id: 'jerera', name: 'Jerera', company: 'NRM' },
+            { id: 'kadoma', name: 'Kadoma', company: 'BALMAIN' },
+            { id: 'karoi', name: 'Karoi', company: 'NORICH' },
+            { id: 'kwekwe', name: 'Kwekwe WS', company: 'BALMAIN' },
+            { id: 'mpandawana', name: 'Mpandawana', company: 'NRM' },
+            { id: 'marondera', name: 'Marondera', company: 'NORICH' },
+            { id: 'masvingohw', name: 'Masvingo HW', company: 'NRM' },
+            { id: 'masvingows', name: 'Masvingo WS', company: 'NRM' },
+            { id: 'nyika', name: 'Nyika', company: 'NRM' },
+            { id: 'rusape', name: 'Rusape', company: 'NORICH' },
+            { id: 'zvishavane', name: 'Zvishavane', company: 'NRM' }
+        ];
+
+        // Storage for survey data
+        let surveyData = JSON.parse(localStorage.getItem('tillSurveyData')) || [];
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing application...');
+            populateBranchSelects();
+            updateStats();
+            loadSurveyHistory();
+            setupEventListeners();
+        });
+
+        // Populate branch dropdowns
+        function populateBranchSelects() {
+            console.log('Populating branch selects...');
+            const branchSelects = [
+                document.getElementById('branchName'),
+                document.getElementById('historyBranchFilter')
+            ];
+            
+            branchSelects.forEach(select => {
+                if (!select) {
+                    console.error('Select element not found');
+                    return;
+                }
+                
+                // Clear existing options except the first one
+                while (select.options.length > 1) {
+                    select.remove(1);
+                }
+                
+                // Add branches
+                branches.forEach(branch => {
+                    const option = document.createElement('option');
+                    option.value = branch.id;
+                    option.textContent = `${branch.name} (${branch.company})`;
+                    select.appendChild(option);
+                });
+            });
+            console.log('Branch selects populated');
+        }
+
+        // Get CSS class for company badge
+        function getCompanyClass(company) {
+            switch(company.toLowerCase()) {
+                case 'nrm': return 'company-nrm';
+                case 'norich': return 'company-norich';
+                case 'balmain': return 'company-balmain';
+                default: return '';
+            }
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            console.log('Setting up event listeners...');
+            
+            // Form elements
+            const faultyTillsInput = document.getElementById('faultyTills');
+            const faultyEFTInput = document.getElementById('faultyEFT');
+            const scannerStatus = document.getElementById('scannerStatus');
+            const surveyForm = document.getElementById('surveyForm');
+            const addFaultyTillBtn = document.getElementById('addFaultyTill');
+            const addFaultyEFTBtn = document.getElementById('addFaultyEFT');
+            const saveDraftBtn = document.getElementById('saveDraft');
+            const newSurveyBtn = document.getElementById('newSurveyBtn');
+            const newSurveyLink = document.getElementById('newSurveyLink');
+            const branchSearch = document.getElementById('branchSearch');
+            const searchResults = document.getElementById('searchResults');
+            const historyBranchFilter = document.getElementById('historyBranchFilter');
+            
+            // Export buttons
+            const exportCSVBtn = document.getElementById('exportCSV');
+            const exportPDFBtn = document.getElementById('exportPDF');
+            const printReportBtn = document.getElementById('printReport');
+            const exportHistoryCSVBtn = document.getElementById('exportHistoryCSV');
+            const exportHistoryPDFBtn = document.getElementById('exportHistoryPDF');
+            
+            // Stats cards
+            const statsCards = document.querySelectorAll('.stats-card');
+
+            // Show/hide faulty till details based on input
+            if (faultyTillsInput) {
+                faultyTillsInput.addEventListener('input', function() {
+                    const faultyCount = parseInt(this.value) || 0;
+                    const faultyTillsDetails = document.getElementById('faultyTillsDetails');
+                    const faultyTillsContainer = document.getElementById('faultyTillsContainer');
+                    
+                    if (faultyCount > 0) {
+                        faultyTillsDetails.style.display = 'block';
+                        faultyTillsContainer.innerHTML = '';
+                        
+                        for (let i = 1; i <= faultyCount; i++) {
+                            addFaultyTillField(i);
+                        }
+                    } else {
+                        faultyTillsDetails.style.display = 'none';
+                    }
+                });
+            }
+
+            // Add faulty till field
+            if (addFaultyTillBtn) {
+                addFaultyTillBtn.addEventListener('click', function() {
+                    const faultyTillsContainer = document.getElementById('faultyTillsContainer');
+                    const faultyTillsInput = document.getElementById('faultyTills');
+                    const currentCount = document.querySelectorAll('#faultyTillsContainer .faulty-item').length;
+                    addFaultyTillField(currentCount + 1);
+                    faultyTillsInput.value = currentCount + 1;
+                });
+            }
+
+            // Show/hide faulty EFT details based on input
+            if (faultyEFTInput) {
+                faultyEFTInput.addEventListener('input', function() {
+                    const faultyCount = parseInt(this.value) || 0;
+                    const faultyEFTDetails = document.getElementById('faultyEFTDetails');
+                    const faultyEFTContainer = document.getElementById('faultyEFTContainer');
+                    
+                    if (faultyCount > 0) {
+                        faultyEFTDetails.style.display = 'block';
+                        faultyEFTContainer.innerHTML = '';
+                        
+                        for (let i = 1; i <= faultyCount; i++) {
+                            addFaultyEFTField(i);
+                        }
+                    } else {
+                        faultyEFTDetails.style.display = 'none';
+                    }
+                });
+            }
+
+            // Add faulty EFT field
+            if (addFaultyEFTBtn) {
+                addFaultyEFTBtn.addEventListener('click', function() {
+                    const faultyEFTContainer = document.getElementById('faultyEFTContainer');
+                    const faultyEFTInput = document.getElementById('faultyEFT');
+                    const currentCount = document.querySelectorAll('#faultyEFTContainer .faulty-item').length;
+                    addFaultyEFTField(currentCount + 1);
+                    faultyEFTInput.value = currentCount + 1;
+                });
+            }
+
+            // Show/hide scanner needs based on selection
+            if (scannerStatus) {
+                scannerStatus.addEventListener('change', function() {
+                    const scannerNeeds = document.getElementById('scannerNeeds');
+                    if (this.value === 'no') {
+                        scannerNeeds.style.display = 'block';
+                    } else {
+                        scannerNeeds.style.display = 'none';
+                    }
+                });
+            }
+
+            // Form submission
+            if (surveyForm) {
+                surveyForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const branchName = document.getElementById('branchName').value;
+                    const totalTills = document.getElementById('totalTills').value;
+                    const workingPrinters = document.getElementById('workingSparePrinters').value;
+                    
+                    if (!branchName || !totalTills || !workingPrinters) {
+                        alert('Please fill in all required fields.');
+                        return;
+                    }
+                    
+                    // Collect form data
+                    const formData = {
+                        id: Date.now(),
+                        branchId: branchName,
+                        branchName: getBranchName(branchName),
+                        company: getBranchCompany(branchName),
+                        date: new Date().toLocaleDateString('en-GB'),
+                        totalTills: parseInt(totalTills),
+                        faultyTills: parseInt(document.getElementById('faultyTills').value) || 0,
+                        workingSparePrinters: parseInt(workingPrinters),
+                        faultyEFT: parseInt(document.getElementById('faultyEFT').value) || 0,
+                        scannerStatus: document.getElementById('scannerStatus').value,
+                        scannersNeeded: document.getElementById('scannerStatus').value === 'no' ? 
+                            parseInt(document.getElementById('scannersNeeded').value) || 0 : 0,
+                        additionalNotes: document.getElementById('additionalNotes').value,
+                        faultyTillDetails: collectFaultyTillDetails(),
+                        faultyEFTDetails: collectFaultyEFTDetails()
+                    };
+                    
+                    // Save to storage
+                    surveyData.push(formData);
+                    localStorage.setItem('tillSurveyData', JSON.stringify(surveyData));
+                    
+                    alert('Survey submitted successfully!');
+                    
+                    // Reset form and update UI
+                    surveyForm.reset();
+                    document.getElementById('faultyTillsDetails').style.display = 'none';
+                    document.getElementById('faultyEFTDetails').style.display = 'none';
+                    document.getElementById('scannerNeeds').style.display = 'none';
+                    
+                    updateStats();
+                    loadSurveyHistory();
+                });
+            }
+
+            // Save draft
+            if (saveDraftBtn) {
+                saveDraftBtn.addEventListener('click', function() {
+                    alert('Draft saved! (In a real application, this would save to temporary storage)');
+                });
+            }
+
+            // New survey button
+            if (newSurveyBtn) {
+                newSurveyBtn.addEventListener('click', function() {
+                    document.getElementById('surveyForm').reset();
+                    document.getElementById('faultyTillsDetails').style.display = 'none';
+                    document.getElementById('faultyEFTDetails').style.display = 'none';
+                    document.getElementById('scannerNeeds').style.display = 'none';
+                });
+            }
+
+            // New survey link
+            if (newSurveyLink) {
+                newSurveyLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.getElementById('surveyForm').reset();
+                    document.getElementById('faultyTillsDetails').style.display = 'none';
+                    document.getElementById('faultyEFTDetails').style.display = 'none';
+                    document.getElementById('scannerNeeds').style.display = 'none';
+                });
+            }
+
+            // Branch search functionality
+            if (branchSearch) {
+                branchSearch.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    searchResults.innerHTML = '';
+                    
+                    if (searchTerm.length < 2) {
+                        searchResults.style.display = 'none';
+                        return;
+                    }
+                    
+                    const filteredBranches = branches.filter(branch => 
+                        branch.name.toLowerCase().includes(searchTerm) || 
+                        branch.company.toLowerCase().includes(searchTerm)
+                    );
+                    
+                    if (filteredBranches.length > 0) {
+                        filteredBranches.forEach(branch => {
+                            const resultItem = document.createElement('div');
+                            resultItem.className = 'search-result-item';
+                            resultItem.innerHTML = `
+                                ${branch.name} <span class="company-badge ${getCompanyClass(branch.company)}">${branch.company}</span>
+                            `;
+                            resultItem.addEventListener('click', function() {
+                                branchSearch.value = branch.name;
+                                searchResults.style.display = 'none';
+                                document.getElementById('branchName').value = branch.id;
+                            });
+                            searchResults.appendChild(resultItem);
+                        });
+                        searchResults.style.display = 'block';
+                    } else {
+                        searchResults.style.display = 'none';
+                    }
+                });
+                
+                // Hide search results when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!branchSearch.contains(e.target) && !searchResults.contains(e.target)) {
+                        searchResults.style.display = 'none';
+                    }
+                });
+            }
+
+            // History branch filter
+            if (historyBranchFilter) {
+                historyBranchFilter.addEventListener('change', function() {
+                    filterHistory(this.value);
+                });
+            }
+
+            // Export functionality
+            if (exportCSVBtn) {
+                exportCSVBtn.addEventListener('click', function() {
+                    exportCurrentDataCSV('all');
+                });
+            }
+
+            if (exportPDFBtn) {
+                exportPDFBtn.addEventListener('click', function() {
+                    exportCurrentDataPDF('all');
+                });
+            }
+
+            if (printReportBtn) {
+                printReportBtn.addEventListener('click', function() {
+                    printCurrentData('all');
+                });
+            }
+
+            if (exportHistoryCSVBtn) {
+                exportHistoryCSVBtn.addEventListener('click', function() {
+                    exportCurrentDataCSV('all');
+                });
+            }
+
+            if (exportHistoryPDFBtn) {
+                exportHistoryPDFBtn.addEventListener('click', function() {
+                    exportCurrentDataPDF('all');
+                });
+            }
+
+            // Stats cards click handlers
+            statsCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const type = this.getAttribute('data-type');
+                    showFaultyItems(type);
+                });
+            });
+
+            console.log('Event listeners setup complete');
+        }
+
+        // Add faulty till field
+        function addFaultyTillField(index) {
+            const faultyTillsContainer = document.getElementById('faultyTillsContainer');
+            const faultyTillDiv = document.createElement('div');
+            faultyTillDiv.className = 'faulty-item mb-2';
+            faultyTillDiv.innerHTML = `
+                <h6>Faulty Till #${index}</h6>
+                <div class="mb-2">
+                    <label class="form-label">Reason for Fault</label>
+                    <input type="text" class="form-control" name="faultyTillReason[]" required>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Ticket Number</label>
+                    <input type="text" class="form-control" name="faultyTillTicket[]" placeholder="e.g., TKT-1234">
+                </div>
+            `;
+            faultyTillsContainer.appendChild(faultyTillDiv);
+        }
+
+        // Add faulty EFT field
+        function addFaultyEFTField(index) {
+            const faultyEFTContainer = document.getElementById('faultyEFTContainer');
+            const faultyEFTDiv = document.createElement('div');
+            faultyEFTDiv.className = 'faulty-item mb-2';
+            faultyEFTDiv.innerHTML = `
+                <h6>Faulty EFT Device #${index}</h6>
+                <div class="mb-2">
+                    <label class="form-label">Issue Description</label>
+                    <input type="text" class="form-control" name="faultyEFTReason[]" required>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Ticket Number</label>
+                    <input type="text" class="form-control" name="faultyEFTTicket[]" placeholder="e.g., TKT-1234">
+                </div>
+            `;
+            faultyEFTContainer.appendChild(faultyEFTDiv);
+        }
+
+        // Collect faulty till details from form
+        function collectFaultyTillDetails() {
+            const details = [];
+            const reasons = document.querySelectorAll('input[name="faultyTillReason[]"]');
+            const tickets = document.querySelectorAll('input[name="faultyTillTicket[]"]');
+            
+            for (let i = 0; i < reasons.length; i++) {
+                if (reasons[i].value.trim()) {
+                    details.push({
+                        reason: reasons[i].value,
+                        ticket: tickets[i].value
+                    });
+                }
+            }
+            
+            return details;
+        }
+
+        // Collect faulty EFT details from form
+        function collectFaultyEFTDetails() {
+            const details = [];
+            const reasons = document.querySelectorAll('input[name="faultyEFTReason[]"]');
+            const tickets = document.querySelectorAll('input[name="faultyEFTTicket[]"]');
+            
+            for (let i = 0; i < reasons.length; i++) {
+                if (reasons[i].value.trim()) {
+                    details.push({
+                        reason: reasons[i].value,
+                        ticket: tickets[i].value
+                    });
+                }
+            }
+            
+            return details;
+        }
+
+        // Get branch name by ID
+        function getBranchName(branchId) {
+            const branch = branches.find(b => b.id === branchId);
+            return branch ? branch.name : 'Unknown';
+        }
+
+        // Get branch company by ID
+        function getBranchCompany(branchId) {
+            const branch = branches.find(b => b.id === branchId);
+            return branch ? branch.company : 'Unknown';
+        }
+
+        // Update statistics
+        function updateStats() {
+            if (surveyData.length === 0) {
+                document.getElementById('totalTillsCount').textContent = '-';
+                document.getElementById('faultyTillsCount').textContent = '-';
+                document.getElementById('workingPrintersCount').textContent = '-';
+                document.getElementById('faultyEFTCount').textContent = '-';
+                return;
+            }
+            
+            const totalTills = surveyData.reduce((sum, survey) => sum + survey.totalTills, 0);
+            const faultyTills = surveyData.reduce((sum, survey) => sum + survey.faultyTills, 0);
+            const workingPrinters = surveyData.reduce((sum, survey) => sum + survey.workingSparePrinters, 0);
+            const faultyEFT = surveyData.reduce((sum, survey) => sum + survey.faultyEFT, 0);
+            
+            document.getElementById('totalTillsCount').textContent = totalTills;
+            document.getElementById('faultyTillsCount').textContent = faultyTills;
+            document.getElementById('workingPrintersCount').textContent = workingPrinters;
+            document.getElementById('faultyEFTCount').textContent = faultyEFT;
+        }
+
+        // Load survey history
+        function loadSurveyHistory() {
+            const historyContainer = document.getElementById('surveyHistory');
+            if (!historyContainer) return;
+            
+            historyContainer.innerHTML = '';
+            
+            if (surveyData.length === 0) {
+                historyContainer.innerHTML = '<p class="text-muted">No survey data available yet. Submit your first survey to see history here.</p>';
+                return;
+            }
+            
+            // Sort by date (newest first)
+            const sortedData = [...surveyData].sort((a, b) => b.id - a.id);
+            
+            sortedData.forEach(survey => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                
+                let faultyItemsHTML = '';
+                
+                if (survey.faultyTillDetails && survey.faultyTillDetails.length > 0) {
+                    survey.faultyTillDetails.forEach(detail => {
+                        faultyItemsHTML += `
+                            <div class="faulty-item mt-2">
+                                <p class="mb-1"><strong>Faulty Till:</strong> ${detail.reason}</p>
+                                <p class="mb-0"><strong>Ticket:</strong> <span class="ticket-number">${detail.ticket || 'Not provided'}</span></p>
+                            </div>
+                        `;
+                    });
+                }
+                
+                if (survey.faultyEFTDetails && survey.faultyEFTDetails.length > 0) {
+                    survey.faultyEFTDetails.forEach(detail => {
+                        faultyItemsHTML += `
+                            <div class="faulty-item mt-2">
+                                <p class="mb-1"><strong>Faulty EFT Device:</strong> ${detail.reason}</p>
+                                <p class="mb-0"><strong>Ticket:</strong> <span class="ticket-number">${detail.ticket || 'Not provided'}</span></p>
+                            </div>
+                        `;
+                    });
+                }
+                
+                historyItem.innerHTML = `
+                    <div class="d-flex justify-content-between">
+                        <h6>${survey.branchName} <span class="company-badge ${getCompanyClass(survey.company)}">${survey.company}</span></h6>
+                        <span class="text-muted">Submitted: ${survey.date}</span>
+                    </div>
+                    <p class="mb-1"><strong>Tills:</strong> ${survey.totalTills} total, ${survey.faultyTills} faulty</p>
+                    <p class="mb-1"><strong>Printers:</strong> ${survey.workingSparePrinters} working spare printers</p>
+                    <p class="mb-1"><strong>EFT Devices:</strong> ${survey.faultyEFT} faulty</p>
+                    <p class="mb-1"><strong>Scanners:</strong> ${survey.scannerStatus === 'yes' ? 'Have enough' : `Need ${survey.scannersNeeded} more`}</p>
+                    ${survey.additionalNotes ? `<p class="mb-1"><strong>Notes:</strong> ${survey.additionalNotes}</p>` : ''}
+                    ${faultyItemsHTML}
+                `;
+                
+                historyContainer.appendChild(historyItem);
+            });
+        }
+
+        // Filter history
+        function filterHistory(branch) {
+            const historyItems = document.querySelectorAll('.history-item');
+            
+            historyItems.forEach(item => {
+                const branchName = item.querySelector('h6').textContent.toLowerCase();
+                
+                if (!branch || branchName.includes(branch)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Show faulty items in modal
+        function showFaultyItems(type) {
+            let title = '';
+            let content = '';
+            
+            switch(type) {
+                case 'all':
+                    title = 'All Survey Data';
+                    content = generateAllDataContent();
+                    break;
+                case 'faulty-tills':
+                    title = 'Faulty Tills Details';
+                    content = generateFaultyTillsContent();
+                    break;
+                case 'working-printers':
+                    title = 'Working Printers Summary';
+                    content = generateWorkingPrintersContent();
+                    break;
+                case 'faulty-eft':
+                    title = 'Faulty EFT Devices Details';
+                    content = generateFaultyEFTContent();
+                    break;
+            }
+            
+            // Create and show modal
+            const modalTitle = document.getElementById('faultyItemsModalTitle');
+            const modalBody = document.getElementById('faultyItemsModalBody');
+            
+            if (modalTitle) modalTitle.textContent = title;
+            if (modalBody) modalBody.innerHTML = content;
+            
+            // Show the modal
+            const modal = new bootstrap.Modal(document.getElementById('faultyItemsModal'));
+            modal.show();
+        }
+
+        // Generate content for all data view
+        function generateAllDataContent() {
+            if (surveyData.length === 0) {
+                return '<p>No survey data available.</p>';
+            }
+            
+            let content = '<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Branch</th><th>Company</th><th>Date</th><th>Total Tills</th><th>Faulty Tills</th><th>Working Printers</th><th>Faulty EFT</th></tr></thead><tbody>';
+            
+            surveyData.forEach(survey => {
+                content += `<tr>
+                    <td>${survey.branchName}</td>
+                    <td><span class="company-badge ${getCompanyClass(survey.company)}">${survey.company}</span></td>
+                    <td>${survey.date}</td>
+                    <td>${survey.totalTills}</td>
+                    <td>${survey.faultyTills}</td>
+                    <td>${survey.workingSparePrinters}</td>
+                    <td>${survey.faultyEFT}</td>
+                </tr>`;
+            });
+            
+            content += '</tbody></table></div>';
+            return content;
+        }
+
+        // Generate content for faulty tills
+        function generateFaultyTillsContent() {
+            const faultyTillsData = surveyData.filter(survey => survey.faultyTills > 0);
+            
+            if (faultyTillsData.length === 0) {
+                return '<p>No faulty tills reported.</p>';
+            }
+            
+            let content = '';
+            
+            faultyTillsData.forEach(survey => {
+                content += `<div class="faulty-item">
+                    <h6>${survey.branchName} <span class="company-badge ${getCompanyClass(survey.company)}">${survey.company}</span></h6>
+                    <p><strong>Total Faulty Tills:</strong> ${survey.faultyTills}</p>`;
+                
+                if (survey.faultyTillDetails && survey.faultyTillDetails.length > 0) {
+                    survey.faultyTillDetails.forEach(detail => {
+                        content += `<div class="faulty-detail">
+                            <p class="mb-1"><strong>Issue:</strong> ${detail.reason}</p>
+                            <p class="mb-0"><strong>Ticket:</strong> <span class="ticket-number">${detail.ticket || 'Not provided'}</span></p>
+                        </div>`;
+                    });
+                }
+                
+                content += `</div>`;
+            });
+            
+            return content;
+        }
+
+        // Generate content for working printers
+        function generateWorkingPrintersContent() {
+            if (surveyData.length === 0) {
+                return '<p>No survey data available.</p>';
+            }
+            
+            let content = '<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Branch</th><th>Company</th><th>Working Printers</th><th>Status</th></tr></thead><tbody>';
+            
+            surveyData.forEach(survey => {
+                const status = survey.workingSparePrinters >= 3 ? 
+                    '<span class="badge bg-success">Adequate</span>' : 
+                    '<span class="badge bg-danger">Insufficient</span>';
+                
+                content += `<tr>
+                    <td>${survey.branchName}</td>
+                    <td><span class="company-badge ${getCompanyClass(survey.company)}">${survey.company}</span></td>
+                    <td>${survey.workingSparePrinters}</td>
+                    <td>${status}</td>
+                </tr>`;
+            });
+            
+            content += '</tbody></table></div>';
+            return content;
+        }
+
+        // Generate content for faulty EFT devices
+        function generateFaultyEFTContent() {
+            const faultyEFTData = surveyData.filter(survey => survey.faultyEFT > 0);
+            
+            if (faultyEFTData.length === 0) {
+                return '<p>No faulty EFT devices reported.</p>';
+            }
+            
+            let content = '';
+            
+            faultyEFTData.forEach(survey => {
+                content += `<div class="faulty-item">
+                    <h6>${survey.branchName} <span class="company-badge ${getCompanyClass(survey.company)}">${survey.company}</span></h6>
+                    <p><strong>Total Faulty EFT Devices:</strong> ${survey.faultyEFT}</p>`;
+                
+                if (survey.faultyEFTDetails && survey.faultyEFTDetails.length > 0) {
+                    survey.faultyEFTDetails.forEach(detail => {
+                        content += `<div class="faulty-detail">
+                            <p class="mb-1"><strong>Issue:</strong> ${detail.reason}</p>
+                            <p class="mb-0"><strong>Ticket:</strong> <span class="ticket-number">${detail.ticket || 'Not provided'}</span></p>
+                        </div>`;
+                    });
+                }
+                
+                content += `</div>`;
+            });
+            
+            return content;
+        }
+
+        // Export current data as CSV
+        function exportCurrentDataCSV(company) {
+            if (surveyData.length === 0) {
+                alert('No data to export.');
+                return;
+            }
+            
+            let dataToExport = surveyData;
+            
+            if (company !== 'all') {
+                dataToExport = surveyData.filter(survey => survey.company.toLowerCase() === company.toLowerCase());
+                
+                if (dataToExport.length === 0) {
+                    alert(`No data found for ${company}.`);
+                    return;
+                }
+            }
+            
+            const headers = ['Branch', 'Company', 'Date', 'Total Tills', 'Faulty Tills', 'Working Printers', 'Faulty EFT', 'Scanner Status', 'Scanners Needed'];
+            const csvData = dataToExport.map(survey => [
+                survey.branchName,
+                survey.company,
+                survey.date,
+                survey.totalTills,
+                survey.faultyTills,
+                survey.workingSparePrinters,
+                survey.faultyEFT,
+                survey.scannerStatus === 'yes' ? 'Enough' : 'Not Enough',
+                survey.scannersNeeded || 0
+            ]);
+            
+            const csvContent = [headers, ...csvData]
+                .map(row => row.map(field => `"${field}"`).join(','))
+                .join('\n');
+            
+            const filename = company === 'all' ? 'till_survey_data.csv' : `till_survey_data_${company}.csv`;
+            downloadCSV(csvContent, filename);
+        }
+
+        // Export current data as PDF
+        function exportCurrentDataPDF(company) {
+            if (surveyData.length === 0) {
+                alert('No data to export.');
+                return;
+            }
+            
+            let dataToExport = surveyData;
+            
+            if (company !== 'all') {
+                dataToExport = surveyData.filter(survey => survey.company.toLowerCase() === company.toLowerCase());
+                
+                if (dataToExport.length === 0) {
+                    alert(`No data found for ${company}.`);
+                    return;
+                }
+            }
+            
+            // Simple PDF generation using window.print for now
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Till Count Survey Report</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; }
+                            table { width: 100%; border-collapse: collapse; }
+                            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                            th { background-color: #3498db; color: white; }
+                            tr:nth-child(even) { background-color: #f2f2f2; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>Till Count Survey Report</h1>
+                        <p>Generated on: ${new Date().toLocaleDateString()}</p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Branch</th>
+                                    <th>Company</th>
+                                    <th>Date</th>
+                                    <th>Total Tills</th>
+                                    <th>Faulty Tills</th>
+                                    <th>Working Printers</th>
+                                    <th>Faulty EFT</th>
+                                    <th>Scanner Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${dataToExport.map(survey => `
+                                    <tr>
+                                        <td>${survey.branchName}</td>
+                                        <td>${survey.company}</td>
+                                        <td>${survey.date}</td>
+                                        <td>${survey.totalTills}</td>
+                                        <td>${survey.faultyTills}</td>
+                                        <td>${survey.workingSparePrinters}</td>
+                                        <td>${survey.faultyEFT}</td>
+                                        <td>${survey.scannerStatus === 'yes' ? 'Enough' : 'Not Enough'}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        // Print current data
+        function printCurrentData(company) {
+            exportCurrentDataPDF(company); // Use the same function for now
+        }
+
+        // Download CSV file
+        function downloadCSV(csvContent, filename) {
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+    </script>
+</body>
+</html>
